@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>
+	Student
+</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+	
+    	
+<script src="/Student/js/carouselHario.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script src="js/jquerysession.js"></script>
+<script src="js/notify.js"></script>
+<script src="js/notify.min.js"></script>
+<!-- Caraousal -->
+<script type="text/javascript" src="/Student/carouselengine/amazingcarousel.js"></script>
+<script type="text/javascript" src="/Student/carouselengine/initcarousel-1.js"></script>
+<link rel="stylesheet" type="text/css" href="/Student/carouselengine/initcarousel-1.css">
+<script type="text/javascript">
+	
+	
+	
+	$(document).ready(function(){
+		var obj = $.session.get("roll");
+		if(typeof obj == "undefined") {
+			window.location="http://localhost:8090/Student/login.html";
+		}
+		else{
+			information();
+		}
+		
+		$("#logout").click(function(){
+			$.session.remove("roll");
+			window.location="http://localhost:8090/Student/login.html";
+		});
+		
+		
+		$("#forRange").hide();
+		$("#forSingle").hide();
+		
+		$('input[type=radio][name=rd1]').change(function() {
+		    if (this.value == 'single') {
+		        $("#forSingle").show();
+		        $("#forRange").hide();
+		        $("#from").val("");
+		        $("#to").val("");
+		        $("#body1").empty();
+		        
+		    }
+		    else if (this.value == 'range') {
+		    	$("#forRange").show();
+		    	$("#forSingle").hide();
+		    	$("#single").val("");
+		    	$("#body1").empty();
+		    }
+		});
+		
+		$("#btn").click(function(){
+			
+			$("#body1").empty();
+			if($("input[name='rd1']:checked").val()=="single" && document.getElementById("single").value==""){
+				//alert("Roll number can't be empty");
+				var notify = $.notify("Roll number can't be empty", {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+			}
+			/* else if(document.getElementById("from").value==""){
+				//alert("Roll number can't be empty");
+				var notify = $.notify("Roll number can't be empty1", {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+			}
+			else if(document.getElementById("to").value==""){
+				//alert("Roll number can't be empty");
+				var notify = $.notify("Roll number can't be empty2", {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+			} */
+			else if(document.getElementById("single").value!="" && $("input[name='rd1']:checked").val()=="single"){
+				ok();
+			}
+			
+			if($("input[name='rd1']:checked").val()=="range" && document.getElementById("from").value==""){
+				//alert("Roll number can't be empty");
+				var notify = $.notify("Roll number can't be empty", {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+			}
+			else if($("input[name='rd1']:checked").val()=="range" && document.getElementById("to").value==""){
+				//alert("Roll number can't be empty");
+				var notify = $.notify("Roll number can't be empty", {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+			}
+			else if(document.getElementById("from").value!="" && document.getElementById("to").value!="" && $("input[name='rd1']:checked").val()=="range"){
+				ok();
+			}
+		});
+		
+		
+		
+	});
+			function information() 
+			{	
+				var jersey_url = "http://localhost:8090/Student/rest/retrieve/information";
+				$.ajax({
+					type: 'POST', // GET
+					contentType: 'application/json',
+					url: jersey_url,
+					error: function(xhr, status, error) {
+						console.log(arguments);
+						alert(" Can't do because: " + xhr);
+					},
+					success: parseDatatoHTMLInformation
+				});
+		
+			}		
+			function parseDatatoHTMLInformation(data) {
+
+				$("#resultSearch").html(data);
+
+				reloadCarousel();
+				//$("#resultSearch").amazingcarousel();
+				//var table = $('#resultSearch').DataTable({"destroy": true,});
+				//table.draw();
+			};
+			
+			
+			
+		
+			function ok(){
+				var ans = $.ajax({
+					type: 'POST',
+					url: "http://localhost:8090/Student/rest/retrieve/rollNo",
+					dataType: 'json',
+					contentType: 'application/json',
+					data: formtoJson()
+					
+				
+				});
+				
+				ans.done(function(data){
+					//var data1 = JSON.decode(data);
+					
+					//window.alert(data.roll);
+					if(data.roll == null){
+						window.alert("a");
+					}
+					
+					for (i in data.roll) {
+						   
+					       var fname = data.roll[i].fname;
+						   var lname = data.roll[i].lname;
+						   var name = "<td>" + fname + " " + lname + "</td>";
+						   var pmarks = "<td>" + data.roll[i].pmarks + "</td>";
+						   var cmarks = "<td>" + data.roll[i].cmarks + "</td>";
+						   var mmarks = "<td>" + data.roll[i].mmarks + "</td>";
+						   var grade = "<td>" + data.roll[i].grade + "</td>";
+						   var gender = "<td>" + data.roll[i].gender + "</td>";
+						   var url = data.roll[i].path;
+						   var image = "<img style='width: 40px; height: 40px;' src=" + url + " />";
+						   var path = "<td>" + image + "</td>";
+						   var rollNo = "<th>" + data.roll[i].rollNo + "</th>";
+						   var dob = "<td>" + data.roll[i].dob + "</td>";
+						   /* $("#roll").html(rollNo);
+						   $("#name").html(fname + " " + lname);
+						   $("#dob").html(dob);
+						   $("#gender").html(gender);
+						   $("#marks").html(marks);
+						   $("#img").attr("src",path); */
+						   
+						   var rowS = "<tr>";
+						   var rowE = "</tr>";
+						   
+						   var ans = rowS + rollNo + name + dob + gender + pmarks + cmarks + mmarks + grade + path +  rowE;
+						   $("#body1").append(ans);
+							
+					}
+				});
+				
+				ans.fail(function ($xhr,textStatus,errorThrown) {
+					var string= $xhr;
+			        console.log("ERROR : ",string);
+		        });
+				function formtoJson(){
+					
+					var from = $("#from").val();
+					var to = $("#to").val();
+					var single = $("#single").val();
+					var sort = $("#sort").val();
+					//window.alert(sort);
+					if(sort == "base"){
+						sort="roll";
+					}
+					if(single == ""){
+						var json = JSON.stringify({
+							"from" : from,
+							"to" : to,
+							"sort" : sort
+						})
+					}
+					else{
+						var json = JSON.stringify({
+							"from" : single,
+							"to" : single,
+							"sort" : sort
+						})
+					}
+					
+					//window.alert(json);
+					return json;
+				}
+				
+			}
+			
+			
+			
+			function getimg(){
+				console.log("i'm here");
+				var ans = $.ajax({
+					type: 'POST',
+					url: "http://localhost:8090/Student/rest/retrieve/caraousel",
+					dataType: 'json',
+					contentType: 'application/json',
+					data: formtoJson1()
+				
+				});
+				ans.done(function(data){
+
+					if(data.img == null){
+						window.alert("a");
+					}
+					for (i in data.img) {
+						console.log(i);
+						   var slides = "<div class=\"slide\">"
+						   				 + "<img src=\"";
+						   var pic = i;
+						   
+						   var slidee = "\" alt=\"image is here\"/>"
+					        			+ "</div>";
+					       
+						   
+						   var ans = slides + pic + slidee;
+						   $("#car").append(ans);
+							
+					}
+				});
+				
+				ans.fail(function ($xhr,textStatus,errorThrown) {
+					var string= $xhr;
+			        console.log("ERROR : ",string);
+		        });
+				
+				function formtoJson1(){
+					var json = JSON.stringify({
+						"x" : "y"
+					})
+				}
+				
+				//window.alert(json);
+				return json;
+			
+
+			}
+			
+			
+			
+			
+
+</script>
+
+<style>
+	  /* Make the image fully responsive */
+
+	/*  .container{
+	  	background-image:url("pubg.gif");
+	    background-size:100%;
+	    background-repeat: repeat-y;
+	    background-attachment: fixed;
+	    height:100%;
+	    width:100%;
+	  }*/
+
+	  .carousel-inner img {
+	      width: 100%;
+	      height: 100%;
+	  }
+	.pic{
+		width:50px;
+		height:50px;
+	}
+	  .carousel-item img{
+	  	border: 4px solid black;
+	  	margin-top: 15px;
+	    height: 400px;
+		}
+
+	  .jumbotron {
+	  	  border: 1px solid black;
+	  	  margin-top: 3%;
+	      padding-top: 3%;
+	      padding-bottom: 3%;
+	    }
+
+	  .a{
+	  	margin-bottom: 8px;
+	  }
+
+	  .b{
+	  	text-align: center;
+	  	font-size: 15px;
+	  	background-color: rgb(211,211,211);
+	  	margin-bottom: 1px;
+	  }
+	  .avatar-pic {
+  		width: 150px;
+	}
+	
+	#slideshow #slideshowWindow {
+	width:512px;
+	height:384px;
+	margin:0;
+	padding:0;
+	position:relative;
+	overflow:hidden;
+        }
+
+    #slideshow #slideshowWindow .slide {
+	margin:0;
+	padding:0;
+	width:512px;
+	height:384px;
+	float:left;
+	position:relative;
+        }
+    
+  
+  </style>
+
+</head>
+<body>
+<!-- ---------------------------Nav Bar--------------------------------------------------------------------->
+
+
+	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+	  <a class="navbar-brand" href="#">
+	  	<a href="index.html"><img src="images/logo.png" alt="logo" style="height:50px;width:50px;" /></a>
+	  </a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse justify-content-center" id="collapsibleNavbar">
+	    <ul class="navbar-nav">
+	      <!-- <li class="nav-item">
+	        <a class="nav-link" href="index.html"><label style="font-size: 15px;">Store Student Information</label></a>
+	      </li> -->
+	      <li class="nav-item">
+	        <a class="nav-link" href="retrieveN.html"><label style="font-size: 15px;">Retrieve Student Information</label></a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="Update.html"><label style="font-size: 15px;">Update Marks</label></a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="chat.jsp"><label style="font-size: 15px;">Chat Room</label></a>
+	      </li>    
+	    </ul>
+	  </div>  
+	  <ul style="padding-top: 10px;" class="nav navbar-nav navbar-right">
+	    	<li>
+	      	<button id="logout" class="btn btn-danger">Logout</button>
+	      	</li>
+	   </ul> 
+	</nav>
+	
+ 	
+<!-- -------------------------Caraousel----------------------------------------------------------------------->
+	 <!--  <div class="container">-->
+		<!--<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div id="demo" class="carousel slide" data-ride="carousel">
+
+				  Indicators
+				  <ul class="carousel-indicators">
+				    <li data-target="#demo" data-slide-to="0" class="active"></li>
+				    <li data-target="#demo" data-slide-to="1"></li>
+				    <li data-target="#demo" data-slide-to="2"></li>
+				  </ul>
+				  
+				  The slideshow
+				  <div class="carousel-inner">
+				    <div class="carousel-item active">
+				      <img src="images/9.jpg" alt="Los Angeles" width="900" height="300">
+				    </div>
+				    <div class="carousel-item">
+				      <img src="images/10.jpg" alt="Chicago" width="900" height="300">
+				    </div>
+				    <div class="carousel-item">
+				      <img src="images/11.jpg" alt="New York" width="900" height="300">
+				    </div>
+				  </div>
+				  
+				  Left and right controls
+				  <a class="carousel-control-prev" href="#demo" data-slide="prev">
+				    <span class="carousel-control-prev-icon"></span>
+				  </a>
+				  <a class="carousel-control-next" href="#demo" data-slide="next">
+				    <span class="carousel-control-next-icon"></span>
+				  </a>
+				</div>
+			</div>
+		</div> -->
+		<!-- <button id="carr" class="btn btn-primary a">check</button>
+		<form id="form1">
+    <div id="slideshow">
+    <div id="slideshowWindow car">
+    
+    </div>
+    </div>
+    </form> -->
+
+<!-- ------------------------Jumbotron------------------------------------------------------------------------>
+		<div   class="container">
+		<!-- newly added start-->
+		<div  id="search" class="row tab-pane container">
+		      <h3>Student Information</h3>
+		      		<!-- <table>
+		      		<tr>
+		                <td>Filter By Grade </td>
+		                <td>
+		                <select id="gradeOption">
+		  						<option value="All">All</option>
+		  						<option value="A">A</option>
+		  						<option value="B">B</option>
+		  						<option value="C">C</option>
+		  						<option value="D">D</option>
+		  						<option value="E">E</option>
+							</select>
+						</td>
+		               	<td>
+							<button id="filterCarousel" type="button" class="btn btn-default">Go</button>
+		                </td>
+		            </tr> 
+		            
+		           
+		            </table> -->
+		      		<div id="resultSearch"></div>
+    		</div>
+    		<!-- newly added -->
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="jumbotron">
+				    <h1>Full Stack Development</h1>      
+				    <p>Task 1-Get input from students.<br>Task 2-Retrieve information of students.</p>
+				</div>
+			</div>
+		</div>	
+		
+		<h2>Retrieve Information</h2>
+		
+		
+		<input name="rd1" type="radio" value="single"><b>Single</b>
+		<input name="rd1" type="radio" value="range"><b>Range</b>
+		<br/>
+		<br/>
+		<div id="forSingle" class="row">
+			<div class="col-md-12"><h3><label for="rnum">Enter Roll No:</label></h3> </div>
+			<div class="form-group col-md-6">	
+				<input type="text" class="form-control" id="single" placeholder="Enter Roll Number" name="rnum">
+			</div>
+		</div>
+		
+		<div id="forRange" class="row"> 		
+			<div class="col-md-12"><h3><label for="rnum">Enter Range for Roll No:</label></h3> </div>
+			<div class="form-group col-md-6">	
+				<h4><label>From:</label></h4>
+				<input type="text" class="form-control" id="from" placeholder="Enter Roll Number" name="rnum">
+			</div>
+			<div class="form-group col-md-6">
+				<h4><label>To:</label></h4>
+				<input type="text" class="form-control" id="to" placeholder="Enter Roll Number" name="rnum">
+			</div>
+		</div>
+		<div  class="container row">
+		<h4><label>Sort By </label></h4>&nbsp;
+			<select class="form-group" id="sort" name="Sort By">
+				<option value="base">select below options</option>
+			    <option value="roll">Roll Number</option>
+			    <option value="name">Name</option>
+			    <option value="dob">DOB</option>
+			    <option value="gender">Gender</option>
+			    <option value="pmarks">PMarks</option>
+			    <option value="cmarks">CMarks</option>
+			    <option value="mmarks">MMarks</option>
+			    <option value="grade">Grade</option>
+			  </select>
+		</div>
+		<button id="btn" type="submit" class="btn btn-primary a">Submit</button>
+		
+		<div class="row">
+			<table class="table table-striped">
+			  <thead >
+			    <tr>
+			      <th scope="col">Roll No.</th>
+			      <th scope="col">Name</th>
+			      <th scope="col">DOB</th>
+			      <th scope="col">Gender</th>
+			      <th scope="col">PMarks</th>
+			      <th scope="col">CMarks</th>
+			      <th scope="col">MMarks</th>
+			      <th scope="col">Grade</th>
+			      <th scope="col">Image</th> 
+			    </tr>
+			  </thead>
+			  <tbody id="body1">
+			    <!-- <tr>
+			      <th id="roll" scope="row"></th>
+			      <td id="name" ></td>
+	
+			      <td id="dob" ></td>
+			      <td id="gender" ></td>
+			      <td id="marks" ></td>
+			    	<td id="image">
+			      <img id="img" alt="" src="">
+			      </td>
+			    </tr> -->
+			  </tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>

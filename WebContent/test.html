@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+$(document).ready(function(){
+		
+		
+		function ok(){
+			event.preventDefault();
+			var file = $('input[name="image"]').get(0).files;
+			var formData = new FormData();
+			//window.alert(file[0]);
+			formData.append('file', file[0]);
+			formData.append('otherDetails',formToJSON());
+	        $("#btn").prop("disabled", true);
+	        
+			var ans = $.ajax({
+				type: 'POST',
+				enctype: 'multipart/form-data',
+				url: "http://localhost:8090/Student/rest/json/abc",
+				//contentType: 'application/json',
+				data: formData,
+				dataType: "json",
+	            processData: false,
+	            contentType: false,
+				
+			});
+			
+			ans.done(function (data) {				
+	            console.log("SUCCESS : ", data.message);  
+	            $("#btnSubmit").prop("disabled", false);
+				//alert
+	            var notify = $.notify('Record added <strong>Successfully</strong>', {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+	        });
+			
+			ans.fail(function ($xhr,textStatus,errorThrown) {
+				var string= $xhr.responseJSON;
+		        console.log("ERROR : ",string.message);
+		        var notify = $.notify(string.message, {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+	            $("#btnSubmit").prop("disabled", false);
+
+	        });
+
+		}
+		
+		
+		
+		function formToJSON(){
+			var fn = $("#fname").val();
+			var ln = $("#lname").val();
+			var roll = $("#rnum").val();
+			var email = $("#email").val();
+			if(email.indexOf('@')<=-1){
+				alert("Invalid email format");
+			}
+			else{
+				var dob = $("#dob").val();
+				var num = $("#num").val();
+				var pm = $("#pmarks").val();
+				var cm = $("#cmarks").val();
+				var mm = $("#mmarks").val();
+				
+				
+				var qe = JSON.stringify({
+					"fn" : fn,
+					"ln" : ln,
+					"roll" : roll,
+					"email" : email,
+					"dob" : dob,
+					"num" : parseInt(num),
+					"pm" : parseInt(pm),
+					"cm" : parseInt(cm),
+					"mm" : parseInt(mm)
+				});
+				return qe;
+			}
+			
+		}
+		
+		function readURL() {
+		 	var file = $('input[name="image"]').get(0).files;
+			//window.alert(file[0]);
+			
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+            	console.log(e.target.result);
+                $('#blah')
+                    .attr('src', e.target.result);
+            };
+
+            reader.readAsDataURL(file[0]);
+        
+    }
+</script>
+</head>
+<body>
+<img alt="aa" src="">
+<button id="btn">submit</button>
+</body>
+</html>

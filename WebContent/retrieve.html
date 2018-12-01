@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>
+	Student
+</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script src="js/notify.js"></script>
+<script src="js/notify.min.js"></script>
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#btn").click(function(){
+			
+			if(document.getElementById("rnum").value==""){
+				//alert("Roll number can't be empty");
+				var notify = $.notify("Roll number can't be empty", {
+	            	type: 'success',
+	            	allow_dismiss: false,
+	            });
+
+	            setTimeout(function() {
+	            	$.notifyClose('top-right');
+	            }, 2000);
+			}
+			else{
+				ok();
+			}
+		});
+		
+	});
+			
+			
+			function ok(){
+				var ans = $.ajax({
+					type: 'POST',
+					url: "http://localhost:8090/Student/rest/json/def",
+					dataType: 'json',
+					contentType: 'application/json',
+					data: formtoJson()
+					
+				});
+				
+				ans.done(function(data){
+					$("#name").html(data.name)
+					$("#dob").html(data.dob)
+					$("#gender").html(data.gender)
+					$("#marks").html(data.marks)
+					var temp = data.pic;
+					console.log("path : " + temp);
+					$("#pic").attr("src",temp)
+					
+				});
+				
+				ans.fail(function ($xhr,textStatus,errorThrown) {
+					var string= $xhr.responseJSON;
+			        console.log("ERROR : ",string.message);
+			        var notify = $.notify(string.message, {
+		            	type: 'success',
+		            	allow_dismiss: false,
+		            });
+
+		            setTimeout(function() {
+		            	$.notifyClose('top-right');
+		            }, 2000);
+		            $("#btnSubmit").prop("disabled", false);
+
+		        });
+				
+				
+			}
+			
+			
+			
+			function formtoJson(){
+				var roll = $("#rnum").val();
+				
+				
+				var qe = JSON.stringify({
+					"roll" : roll,
+				});
+				return qe;
+			}
+
+</script>
+
+<style>
+	  /* Make the image fully responsive */
+
+	/*  .container{
+	  	background-image:url("pubg.gif");
+	    background-size:100%;
+	    background-repeat: repeat-y;
+	    background-attachment: fixed;
+	    height:100%;
+	    width:100%;
+	  }*/
+
+	  .carousel-inner img {
+	      width: 100%;
+	      height: 100%;
+	  }
+	.pic{
+		width:50px;
+		height:50px;
+	}
+	  .carousel-item img{
+	  	border: 4px solid black;
+	  	margin-top: 15px;
+	    height: 400px;
+		}
+
+	  .jumbotron {
+	  	  border: 1px solid black;
+	  	  margin-top: 3%;
+	      padding-top: 3%;
+	      padding-bottom: 3%;
+	    }
+
+	  .a{
+	  	margin-bottom: 8px;
+	  }
+
+	  .b{
+	  	text-align: center;
+	  	font-size: 15px;
+	  	background-color: rgb(211,211,211);
+	  	margin-bottom: 1px;
+	  }
+	  .avatar-pic {
+  		width: 150px;
+	}
+    
+  
+  </style>
+
+</head>
+<body>
+
+<!-- ---------------------------Nav Bar--------------------------------------------------------------------->
+
+
+	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+	  <a class="navbar-brand" href="#">
+	  	<img src="images/img.jpg" alt="logo" style="width:40px;" />
+	  </a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse justify-content-center" id="collapsibleNavbar">
+	    <ul class="navbar-nav">
+	      <li class="nav-item">
+	        <a class="nav-link" href="index.html">Store Student Information</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="retrieve.html">Retrieve Student Information</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="Update.html">Update Marks</a>
+	      </li>    
+	    </ul>
+	  </div>  
+	</nav>
+	
+	
+<!-- -------------------------Caraousel----------------------------------------------------------------------->
+	<div class="container">
+	<!-- <div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div id="demo" class="carousel slide" data-ride="carousel">
+
+				  Indicators
+				  <ul class="carousel-indicators">
+				    <li data-target="#demo" data-slide-to="0" class="active"></li>
+				    <li data-target="#demo" data-slide-to="1"></li>
+				    <li data-target="#demo" data-slide-to="2"></li>
+				  </ul>
+				  
+				  The slideshow
+				  <div class="carousel-inner">
+				    <div class="carousel-item active">
+				      <img src="images/9.jpg" alt="Los Angeles" width="900" height="300">
+				    </div>
+				    <div class="carousel-item">
+				      <img src="images/10.jpg" alt="Chicago" width="900" height="300">
+				    </div>
+				    <div class="carousel-item">
+				      <img src="images/11.jpg" alt="New York" width="900" height="300">
+				    </div>
+				  </div>
+				  
+				  Left and right controls
+				  <a class="carousel-control-prev" href="#demo" data-slide="prev">
+				    <span class="carousel-control-prev-icon"></span>
+				  </a>
+				  <a class="carousel-control-next" href="#demo" data-slide="next">
+				    <span class="carousel-control-next-icon"></span>
+				  </a>
+				</div>
+			</div> 
+		</div> -->
+
+
+<!-- ------------------------Jumbotron------------------------------------------------------------------------>
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="jumbotron">
+				    <h1>Full Stack Development</h1>      
+				    <p>Task 1-Get input from students.<br>Task 2-Retrieve information of students.</p>
+				</div>
+			</div>
+		</div>	
+
+
+		<div class="row">
+			<div id="store" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<p id="a"></p>
+				<h2>Retrieve Information</h2>
+				    
+				    <div class="form-group">
+				      <label for="rnum">Enter Roll No:</label>
+				      <input type="text" class="form-control form-control-sm" id="rnum" placeholder="Enter Roll Number" name="rnum">
+				    </div>
+
+				    <button id="btn" type="submit" class="btn btn-primary a">Submit</button>
+				    
+				<div>Full Name: </div>
+				<div id = "name"></div>
+				<br>
+				
+				<div>DOB: </div>
+				<div id = "dob"></div>
+				<br>
+				
+				<div>Gender: </div>
+				<div id = "gender"></div>
+				<br>
+				
+				<div>Marks</div>
+				<div id = "marks"></div>
+				<br>
+				
+				<div >Image</div>
+				<img style="width: 150px;height: 150px;" src="https://mdbootstrap.com/img/Photos/Others/placeholder-avatar.jpg" id="pic" alt="pic"/>
+				<br>
+				
+	
+			</div>
+		</div>
+	</div>
+</body>
+</html>
